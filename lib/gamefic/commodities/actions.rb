@@ -52,6 +52,19 @@ module Gamefic
         end
       end
 
+      respond :collect, available(::Commodity, ambiguous: true) do |actor, comms|
+        comms.reject { |com| com.parent == actor }
+             .each { |com| actor.perform "take #{com.plural_name} from #{com.parent}" }
+      end
+      interpret 'collect all :commodity', 'collect :commodity'
+      interpret 'collect all of :commodity', 'collect :commodity'
+      interpret 'collect every :commodity', 'collect :commodity'
+      interpret 'collect each :commodity', 'collect :commodity'
+      interpret 'take all :commodity', 'collect :commodity'
+      interpret 'take all of :commodity', 'collect :commodity'
+      interpret 'take every :commodity', 'collect :commodity'
+      interpret 'take each :commodity', 'collect :commodity'
+
       meta nil, plaintext do |actor, text|
         words = text.keywords
         verb = words.shift

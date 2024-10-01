@@ -57,4 +57,16 @@ RSpec.describe Gamefic::Commodities::Actions do
     expect(player.children).to be_one
     expect(player.children.first.quantity).to eq(2)
   end
+
+  it 'collects' do
+    plot = klass.new
+    player = plot.introduce
+    Commodity.new(name: 'thing', parent: plot.room)
+    supporter = Supporter.new(name: 'supporter', parent: plot.room)
+    Commodity.new(name: 'thing', parent: supporter)
+    player.perform 'take all the things'
+    expect(plot.room.children).to eq([player, supporter])
+    expect(player.children).to be_one
+    expect(player.children.first.quantity).to eq(2)
+  end
 end
