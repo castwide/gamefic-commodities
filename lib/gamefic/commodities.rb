@@ -11,3 +11,5 @@ module Gamefic
     require 'gamefic/commodities/actions'
   end
 end
+
+Gamefic::Standard.include Gamefic::Commodities::Actions
