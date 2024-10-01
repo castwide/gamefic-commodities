@@ -39,6 +39,7 @@ module Gamefic
       end
 
       def except(amount)
+        validate_split(amount)
         split(quantity - amount)
       end
 
@@ -72,9 +73,9 @@ module Gamefic
       end
 
       def validate_split(amount)
-        raise CommodityError, "You need to specify 1 or more #{plural_name}." unless amount.positive?
+        raise CommodityError, "There #{maybe_plural('is', 'are')} only #{quantity} #{name}." unless amount <= quantity
 
-        raise CommodityError, "There are only #{quantity} #{name}" unless amount <= quantity
+        raise CommodityError, "You need to specify 1 or more #{plural_name}." unless amount.positive?
       end
     end
   end

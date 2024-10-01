@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
-RSpec.describe Gamefic::Commodities do
-  it 'has a version number' do
-    expect(Gamefic::Commodities::VERSION).not_to be nil
+RSpec.describe Gamefic::Commodities::Commodity do
+  it 'groups' do
+    room = Room.new(name: 'room')
+    thing1 = Commodity.new(name: 'thing', parent: room)
+    thing2 = Commodity.new(name: 'thing')
+    thing2.parent = room
+    expect(room.children).to eq([thing1])
+    expect(thing1.quantity).to be(2)
+    expect(thing2.parent).to be_nil
   end
 
   it 'splits' do

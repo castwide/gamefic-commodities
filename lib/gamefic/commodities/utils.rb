@@ -27,7 +27,7 @@ module Gamefic
         else
           actor.proceed
         end
-      rescue ::CommodityError => err
+      rescue Commodity::CommodityError => err
         actor.tell err.message
       end
     end
