@@ -6,29 +6,25 @@ module Gamefic
       module_function
 
       # @param actor [Gamefic::Actor]
-      # @param verb [Symbol]
       # @param number [Integer]
-      # @param result [Gamefic::Query::Result]
-      def try actor, verb, number, result
-        return actor.proceed if result.match.empty?
-
-        if result.match.one?
-          thing = result.match.first
-          if number == thing.quantity
-            actor.perform "#{verb} #{thing.object_id} #{result.remainder}"
+      # @param command [String]
+      def try_quantity actor, number, command
+        expressions = Syntax.tokenize(command, actor.epic.syntaxes)
+        command = Gamefic::Command.compose(actor, expressions)
+        if command.arguments.first.is_a?(Commodity)
+          if command.arguments.first.quantity == number
+            actor.execute command.verb, *command.arguments
           else
-            from = thing.parent
-            rest = thing.except(number)
-            actor.perform "#{verb} #{thing.object_id} #{result.remainder}"
+            rest = command.arguments.first.except(number)
+            from = command.arguments.first.parent
+            actor.execute command.verb, *command.arguments
             rest.parent = from
           end
-        elsif result.remainder.empty?
-          actor.execute verb, result.match
         else
           actor.proceed
         end
-      rescue Commodity::CommodityError => err
-        actor.tell err.message
+      rescue Commodity::CommodityError => e
+        actor.tell e.message
       end
     end
   end

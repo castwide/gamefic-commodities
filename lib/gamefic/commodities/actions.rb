@@ -16,28 +16,38 @@ module Gamefic
         end
       end
 
+      respond :take, siblings(::Commodity) do |actor, _|
+        actor.proceed
+      end
+
+      respond :place, siblings(::Commodity), available do |actor, _|
+        actor.proceed
+      end
+
+      respond :place, children(::Commodity), available do |actor, _|
+        actor.proceed
+      end
+
+      respond :insert, siblings(::Commodity), available do |actor, _|
+        actor.proceed
+      end
+
+      respond :insert, children(::Commodity), available do |actor, _|
+        actor.proceed
+      end
+
       respond :take, available(::Commodity, ambiguous: true) do |actor, comms|
+        comms = comms.reject { |com| com.parent == actor }
         if comms.one?
-          actor.proceed
+          actor.execute :take, comms.first
         else
           filtered = comms.reject { |ent| actor.flatten.include?(ent) }
           if filtered.one?
             actor.execute :take, filtered.first
           else
-            actor.tell "I don't know if you mean #{filtered.map(&:definitely).join_or}"
-          end
-        end
-      end
-
-      respond :drop, available(::Commodity, ambiguous: true) do |actor, comms|
-        if comms.one?
-          actor.proceed
-        else
-          filtered = comms.select { |ent| actor.flatten.include?(ent) }
-          if filtered.one?
-            actor.execute :drop, filtered.first
-          else
-            actor.tell "I don't know if you mean #{filtered.map(&:definitely).join_or}"
+            places = filtered.map { |object| object.parent.definitely }
+            actor.tell "Where do you want to take one from, #{places.join_or}?"
+            actor.ask_for_what "take #{filtered.first.name} from __what__"
           end
         end
       end
@@ -48,8 +58,7 @@ module Gamefic
         next actor.proceed if words.empty? || words.first =~ /[^\d]+/
 
         number = words.shift.to_i
-        result = available(::Commodity, ambiguous: true).query(actor, words.join(' '))
-        Utils.try(actor, verb.to_sym, number, result)
+        Utils.try_quantity(actor, number, "#{verb} #{words.join(' ')}")
       end
     end
   end
