@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-# A groupable Gamefic entity.
-#
-# Commodities are grouped by default. When a commodity gets added to a parent
-# that already contains a commodity with the same class and name, they get
-# combined, i.e., the existing commodity's quantity is increased by the new
-# commodity's quantity, and the other commodity is destroyed.
-#
 module Gamefic
   module Commodities
+    # A groupable Gamefic entity.
+    #
+    # Commodities are grouped by default. When a commodity gets added to a parent
+    # that already contains a commodity with the same class and name, they get
+    # combined, i.e., the existing commodity's quantity is increased by the new
+    # commodity's quantity, and the other commodity is destroyed.
+    #
     class Commodity < Item
       class CommodityError < ArgumentError; end
 
