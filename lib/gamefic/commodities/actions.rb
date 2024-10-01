@@ -56,6 +56,8 @@ module Gamefic
         comms.reject { |com| com.parent == actor }
              .each { |com| actor.perform "take #{com.plural_name} from #{com.parent}" }
       end
+      interpret 'collect all', 'take all'
+      interpret 'collect :thing', 'take :thing'
       interpret 'collect all :commodity', 'collect :commodity'
       interpret 'collect all of :commodity', 'collect :commodity'
       interpret 'collect every :commodity', 'collect :commodity'
@@ -72,6 +74,12 @@ module Gamefic
 
         number = words.shift.to_i
         Utils.try_quantity(actor, number, "#{verb} #{words.join(' ')}")
+      end
+
+      on_update do
+        entities.that_are(::Commodity)
+                .reject(&:parent)
+                .each { |entity| destroy entity }
       end
     end
   end
