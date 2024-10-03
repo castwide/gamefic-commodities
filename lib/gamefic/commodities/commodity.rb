@@ -72,6 +72,18 @@ module Gamefic
         super + plural_name.keywords
       end
 
+      def counted?
+        @counted ||= false
+      end
+
+      def count &block
+        @counted = true
+        yield block if block_given?
+        @counted = false
+      end
+
+      private
+
       def validate_split(amount)
         raise CommodityError, "There #{maybe_plural('is', 'are')} only #{quantity} #{name}." unless amount <= quantity
 

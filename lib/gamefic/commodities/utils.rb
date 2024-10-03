@@ -9,16 +9,17 @@ module Gamefic
       # @param number [Integer]
       # @param command [String]
       def try_quantity actor, number, command
-        expressions = Syntax.tokenize(command, actor.epic.syntaxes)
-        command = Gamefic::Command.compose(actor, expressions)
+        command = Gamefic::Command.compose(actor, command)
         if command.arguments.first.is_a?(Commodity)
-          if command.arguments.first.quantity == number
-            actor.execute command.verb, *command.arguments
-          else
-            rest = command.arguments.first.except(number)
-            from = command.arguments.first.parent
-            actor.execute command.verb, *command.arguments
-            rest.parent = from
+          command.arguments.first.count do
+            if command.arguments.first.quantity == number
+              actor.execute command.verb, *command.arguments
+            else
+              rest = command.arguments.first.except(number)
+              from = command.arguments.first.parent
+              actor.execute command.verb, *command.arguments
+              rest.parent = from
+            end
           end
         else
           actor.proceed
