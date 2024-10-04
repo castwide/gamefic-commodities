@@ -2,21 +2,65 @@
 
 A groupable Gamefic entity.
 
+Commodities are grouped by default. When a commodity gets added to a parent
+that already contains a commodity with the same class and name, they get
+combined, i.e., the existing commodity's quantity is increased by the new
+commodity's quantity, and the other commodity is destroyed.
+
+Players can specify quantities in commands, e.g., `take 1 coin`.
+
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add the library to your Gamefic project's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```
+gem 'gamefic-commodities'
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+Run `bundle install`.
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Add the requirement to your project's code (typically in `main.rb`):
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+```
+require 'gamefic-commodities'
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+The `Commodity` entity and related actions are automatically imported into `Gamefic::Standard`.
+
+Example of adding a commodity:
+
+```ruby
+class Example::Plot < Gamefic::Plot
+  include Gamefic::Standard
+
+  attr_seed :room, Room,
+            name: 'room'
+
+  make_seed Commodity,
+            name: 'coin',
+            quantity: 2,
+            parent: _attr(:room)
+
+  introduction do |actor|
+    actor.parent = room
+  end
+end
+```
+
+Example gameplay:
+
+    > look
+    You see 2 coins.
+    > take coin
+    You take 2 coins.
+    > drop 1 coin
+    You drop a coin.
+    > look
+    You see a coin.
+    > inventory
+    You're carrying a coin.
 
 ## Development
 
@@ -26,4 +70,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gamefic-commodity.
+Bug reports and pull requests are welcome on GitHub at https://github.com/castwide/gamefic-commodity.

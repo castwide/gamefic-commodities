@@ -8,18 +8,11 @@ module Gamefic
       # @param actor [Gamefic::Actor]
       # @param number [Integer]
       # @param command [String]
-      def try_quantity actor, number, command
+      def try_quantity(actor, number, command)
         command = Gamefic::Command.compose(actor, command)
         if command.arguments.first.is_a?(Commodity)
-          command.arguments.first.count do
-            if command.arguments.first.quantity == number
-              actor.execute command.verb, *command.arguments
-            else
-              rest = command.arguments.first.except(number)
-              from = command.arguments.first.parent
-              actor.execute command.verb, *command.arguments
-              rest.parent = from
-            end
+          command.arguments.first.count(number) do
+            actor.execute command.verb, *command.arguments
           end
         else
           actor.proceed

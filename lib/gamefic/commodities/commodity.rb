@@ -34,18 +34,23 @@ module Gamefic
         quantity > 1
       end
 
+      # @return [String]
       def plural_name
         @plural_name ||= "#{@name}s"
       end
 
+      # @param amount [Integer]
+      # @return [Commodity]
       def except(amount)
         validate_split(amount)
         split(quantity - amount)
       end
 
+      # @param amount [Integer]
+      # @return [Commodity]
       def split(amount)
         validate_split(amount)
-        return self if amount == quantity
+        return nil if amount.zero?
 
         dup.tap do |other|
           self.quantity -= amount
@@ -76,18 +81,21 @@ module Gamefic
         @counted ||= false
       end
 
-      def count &block
+      def count(number)
+        return unless block_given?
+
         @counted = true
-        yield block if block_given?
+        rest = except(number)
+        from = parent
+        yield
+        rest&.parent = from
         @counted = false
       end
-
-      private
 
       def validate_split(amount)
         raise CommodityError, "There #{maybe_plural('is', 'are')} only #{quantity} #{name}." unless amount <= quantity
 
-        raise CommodityError, "You need to specify 1 or more #{plural_name}." unless amount.positive?
+        raise CommodityError, "You need to specify 1 or more #{plural_name}." unless amount >= 0
       end
     end
   end
