@@ -11,6 +11,13 @@ RSpec.describe Gamefic::Commodities::Commodity do
     expect(thing2.parent).to be_nil
   end
 
+  it 'uses quantities for indefinite articles' do
+    commodity = Commodity.new(name: 'thing')
+    expect(commodity.indefinitely).to eq('a thing')
+    commodity.quantity = 2
+    expect(commodity.indefinitely).to eq('2 things')
+  end
+
   describe '#split' do
     it 'splits' do
       thing1 = Commodity.new(name: 'thing', quantity: 4)
@@ -30,7 +37,6 @@ RSpec.describe Gamefic::Commodities::Commodity do
       thing = Commodity.new(name: 'thing', quantity: 1)
       expect { thing.split(5) }.to raise_error(Commodity::CommodityError)
     end
-  
   end
 
   describe '#count' do
