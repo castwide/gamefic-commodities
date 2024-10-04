@@ -7,9 +7,9 @@ module Gamefic
 
       # @param actor [Gamefic::Actor]
       # @param number [Integer]
-      # @param command [String]
-      def try_quantity(actor, number, command)
-        command = Gamefic::Command.compose(actor, command)
+      # @param input [String]
+      def try_quantity(actor, number, input)
+        command = Gamefic::Command.compose(actor, input)
         return actor.proceed unless command.arguments.first.is_a?(Commodity)
 
         command.arguments.first.count(number) do
