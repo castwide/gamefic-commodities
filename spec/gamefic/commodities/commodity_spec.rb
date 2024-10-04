@@ -44,5 +44,14 @@ RSpec.describe Gamefic::Commodities::Commodity do
       thing = Commodity.new(name: 'thing', quantity: 1)
       expect { thing.count(0) }.to raise_error(Commodity::CommodityError)
     end
+
+    it 'manages #counted? state' do
+      thing = Commodity.new(name: 'thing', quantity: 1)
+      expect(thing.counted?).to be(false)
+      thing.count(1) do
+        expect(thing.counted?).to be(true)
+      end
+      expect(thing.counted?).to be(false)
+    end
   end
 end
