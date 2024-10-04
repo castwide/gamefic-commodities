@@ -82,20 +82,21 @@ module Gamefic
       end
 
       def count(number)
+        raise CommodityError, "You need to specify 1 or more #{plural_name}" if number.zero?
         return unless block_given?
 
         @counted = true
         rest = except(number)
         from = parent
         yield
-        rest&.parent = from
+        rest&.parent = from if rest&.quantity&.positive?
         @counted = false
       end
 
       def validate_split(amount)
         raise CommodityError, "There #{maybe_plural('is', 'are')} only #{quantity} #{name}." unless amount <= quantity
 
-        raise CommodityError, "You need to specify 1 or more #{plural_name}." unless amount >= 0
+        raise CommodityError, "You can't specify a negative number of #{plural_name}." unless amount >= 0
       end
     end
   end
