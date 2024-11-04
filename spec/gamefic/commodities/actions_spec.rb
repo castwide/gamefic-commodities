@@ -6,7 +6,7 @@ RSpec.describe Gamefic::Commodities::Actions do
       include Gamefic::Standard
       include Gamefic::Commodities::Actions
 
-      attr_seed :room, Room, name: 'room'
+      attr_seed :room, Gamefic::Standard::Room, name: 'room'
 
       introduction { |actor| actor.parent = room }
     end
@@ -70,6 +70,7 @@ RSpec.describe Gamefic::Commodities::Actions do
     Commodity.new(name: 'thing', parent: plot.room)
     Commodity.new(name: 'thing', parent: player)
     player.perform 'take 1 thing'
+    puts player.messages
     expect(plot.room.children).to eq([player])
     expect(player.children).to be_one
     expect(player.children.first.quantity).to eq(2)
@@ -79,7 +80,7 @@ RSpec.describe Gamefic::Commodities::Actions do
     plot = klass.new
     player = plot.introduce
     Commodity.new(name: 'thing', parent: plot.room)
-    supporter = Supporter.new(name: 'supporter', parent: plot.room)
+    supporter = Gamefic::Standard::Supporter.new(name: 'supporter', parent: plot.room)
     Commodity.new(name: 'thing', parent: supporter)
     player.perform 'take all the things'
     expect(plot.room.children).to eq([player, supporter])
@@ -89,17 +90,17 @@ RSpec.describe Gamefic::Commodities::Actions do
 
   it 'disambiguates' do
     plot = klass.new
+    narrator = Gamefic::Narrator.new(plot)
     player = plot.introduce
-    supporter = Supporter.new(name: 'supporter', parent: plot.room)
-    container = Container.new(name: 'container', open: true, parent: plot.room)
+    supporter = Gamefic::Standard::Supporter.new(name: 'supporter', parent: plot.room)
+    container = Gamefic::Standard::Container.new(name: 'container', open: true, parent: plot.room)
     taken = Commodity.new(name: 'thing', parent: supporter)
     Commodity.new(name: 'thing', parent: container)
-    plot.ready
     player.perform 'take thing'
     expect(player.messages).to match(/Where.*?supporter.*?container/)
-    plot.update
-    plot.ready
-    player.perform 'supporter'
+    narrator.start
+    player.queue.push 'supporter'
+    narrator.finish
     expect(supporter.children).to be_empty
     expect(player.children).to eq([taken])
   end
@@ -107,7 +108,7 @@ RSpec.describe Gamefic::Commodities::Actions do
   it 'proceeds on non-commodities with quantities' do
     plot = klass.new
     player = plot.introduce
-    item = Item.new(name: 'thing', parent: plot.room)
+    item = Gamefic::Standard::Item.new(name: 'thing', parent: plot.room)
     player.perform 'take 2 thing'
     expect(player.messages).to include("don't know what you mean")
     expect(item.parent).to be(plot.room)
@@ -117,7 +118,7 @@ RSpec.describe Gamefic::Commodities::Actions do
     plot = klass.new
     player = plot.introduce
     plot.make Commodity, name: 'thing'
-    plot.update
+    plot.update_blocks.each(&:call)
     expect(plot.entities).to eq([plot.room, player])
   end
 end

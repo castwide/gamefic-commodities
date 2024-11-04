@@ -2,7 +2,7 @@
 
 RSpec.describe Gamefic::Commodities::Commodity do
   it 'groups' do
-    room = Room.new(name: 'room')
+    room = Gamefic::Standard::Room.new(name: 'room')
     thing1 = Commodity.new(name: 'thing', parent: room)
     thing2 = Commodity.new(name: 'thing')
     thing2.parent = room

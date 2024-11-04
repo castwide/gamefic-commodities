@@ -9,7 +9,7 @@ module Gamefic
     # combined, i.e., the existing commodity's quantity is increased by the new
     # commodity's quantity, and the other commodity is destroyed.
     #
-    class Commodity < Item
+    class Commodity < Gamefic::Standard::Item
       class CommodityError < ArgumentError; end
 
       # @return [Integer]

@@ -35,13 +35,13 @@ Example of adding a commodity:
 class Example::Plot < Gamefic::Plot
   include Gamefic::Standard
 
-  attr_seed :room, Room,
+  construct :room, Room,
             name: 'room'
 
   make_seed Commodity,
             name: 'coin',
             quantity: 2,
-            parent: _attr(:room)
+            parent: room
 
   introduction do |actor|
     actor.parent = room

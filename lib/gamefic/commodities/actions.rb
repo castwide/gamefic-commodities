@@ -5,6 +5,8 @@ module Gamefic
     module Actions
       extend Gamefic::Scriptable
 
+      include Gamefic::What
+
       respond :look, ::Commodity do |actor, thing|
         actor.proceed
         next unless thing.plural?
@@ -36,26 +38,26 @@ module Gamefic
         actor.proceed
       end
 
-      respond :take, available(::Commodity, ambiguous: true) do |actor, comms|
-        comms = comms.reject { |com| com.parent == actor }
-        if comms.one?
-          actor.execute :take, comms.first
+      respond :take, plaintext do |actor, text|
+        commodities = Utils.match_nearby_commodities(actor, text)
+        next actor.proceed if commodities.empty?
+
+        if commodities.one?
+          actor.execute :take, commodities.first
         else
-          filtered = comms.reject { |ent| actor.flatten.include?(ent) }
-          if filtered.one?
-            actor.execute :take, filtered.first
-          else
-            places = filtered.map { |object| object.parent.definitely }
-            actor.tell "Where do you want to take one from, #{places.join_or}?"
-            actor.ask_for_what "take #{filtered.first.name} from __what__"
-          end
+          places = commodities.map { |object| object.parent.definitely }
+          actor.tell "Where do you want to take one from, #{places.join_or}?"
+          actor.cue AskForWhat, template: "take #{commodities.first.name} from __what__"
         end
       end
 
-      respond :collect, available(::Commodity, ambiguous: true) do |actor, comms|
-        comms.reject { |com| com.parent == actor }
-             .each { |com| actor.perform "take #{com.plural_name} from #{com.parent}" }
+      respond :collect, plaintext do |actor, text|
+        commodities = Utils.match_nearby_commodities(actor, text)
+        next actor.proceed if commodities.empty?
+
+        commodities.each { |com| actor.perform "take #{com.plural_name} from #{com.parent}" }
       end
+
       interpret 'collect all', 'take all'
       interpret 'collect :thing', 'take :thing'
       interpret 'collect all :commodity', 'collect :commodity'
@@ -67,13 +69,20 @@ module Gamefic
       interpret 'take every :commodity', 'collect :commodity'
       interpret 'take each :commodity', 'collect :commodity'
 
-      meta nil, plaintext do |actor, text|
-        words = text.keywords
-        verb = words.shift
-        next actor.proceed if words.empty? || words.first =~ /[^\d]+/
+      respond :take, integer, siblings(Commodity) do |actor, quantity, commodity|
+        Utils.try_quantity(actor, :take, quantity, commodity)
+      end
 
-        number = words.shift.to_i
-        Utils.try_quantity(actor, number, "#{verb} #{words.join(' ')}")
+      respond :drop, integer, children(Commodity) do |actor, quantity, commodity|
+        Utils.try_quantity(actor, :drop, quantity, commodity)
+      end
+
+      respond :insert, integer, children(Commodity), available do |actor, quantity, commodity, other|
+        Utils.try_quantity(actor, :insert, quantity, commodity, other)
+      end
+
+      respond :place, integer, children(Commodity), available do |actor, quantity, commodity, other|
+        Utils.try_quantity(actor, :place, quantity, commodity, other)
       end
 
       on_update do
