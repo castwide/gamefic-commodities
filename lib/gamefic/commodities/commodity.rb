@@ -101,5 +101,3 @@ module Gamefic
     end
   end
 end
-
-Commodity = Gamefic::Commodities::Commodity

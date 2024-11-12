@@ -7,7 +7,7 @@ module Gamefic
 
       include Gamefic::What
 
-      respond :look, ::Commodity do |actor, thing|
+      respond :look, Commodity do |actor, thing|
         actor.proceed
         next unless thing.plural?
 
@@ -18,23 +18,23 @@ module Gamefic
         end
       end
 
-      respond :take, siblings(::Commodity) do |actor, _|
+      respond :take, siblings(Commodity) do |actor, _|
         actor.proceed
       end
 
-      respond :place, siblings(::Commodity), available do |actor, _|
+      respond :place, siblings(Commodity), available do |actor, _|
         actor.proceed
       end
 
-      respond :place, children(::Commodity), available do |actor, _|
+      respond :place, children(Commodity), available do |actor, _|
         actor.proceed
       end
 
-      respond :insert, siblings(::Commodity), available do |actor, _|
+      respond :insert, siblings(Commodity), available do |actor, _|
         actor.proceed
       end
 
-      respond :insert, children(::Commodity), available do |actor, _|
+      respond :insert, children(Commodity), available do |actor, _|
         actor.proceed
       end
 
@@ -86,7 +86,7 @@ module Gamefic
       end
 
       on_update do
-        entities.that_are(::Commodity)
+        entities.that_are(Commodity)
                 .reject(&:parent)
                 .each { |entity| destroy entity }
       end
