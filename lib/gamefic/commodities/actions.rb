@@ -18,26 +18,6 @@ module Gamefic
         end
       end
 
-      respond :take, siblings(Commodity) do |actor, _|
-        actor.proceed
-      end
-
-      respond :place, siblings(Commodity), available do |actor, _|
-        actor.proceed
-      end
-
-      respond :place, children(Commodity), available do |actor, _|
-        actor.proceed
-      end
-
-      respond :insert, siblings(Commodity), available do |actor, _|
-        actor.proceed
-      end
-
-      respond :insert, children(Commodity), available do |actor, _|
-        actor.proceed
-      end
-
       respond :take, plaintext do |actor, text|
         commodities = Utils.match_nearby_commodities(actor, text)
         next actor.proceed if commodities.empty?

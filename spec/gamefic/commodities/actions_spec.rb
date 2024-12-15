@@ -70,7 +70,6 @@ RSpec.describe Gamefic::Commodities::Actions do
     Gamefic::Commodities::Commodity.new(name: 'thing', parent: plot.room)
     Gamefic::Commodities::Commodity.new(name: 'thing', parent: player)
     player.perform 'take 1 thing'
-    puts player.messages
     expect(plot.room.children).to eq([player])
     expect(player.children).to be_one
     expect(player.children.first.quantity).to eq(2)
@@ -120,5 +119,34 @@ RSpec.describe Gamefic::Commodities::Actions do
     plot.make Gamefic::Commodities::Commodity, name: 'thing'
     plot.update_blocks.each(&:call)
     expect(plot.entities).to eq([plot.room, player])
+  end
+
+  it 'drops quantities' do
+    plot = klass.new
+    player = plot.introduce
+    plot.make Gamefic::Commodities::Commodity, name: 'thing', quantity: 5, parent: player
+    player.perform 'drop 2 things'
+    expect(player.children.first.quantity).to eq(3)
+    expect(plot.room.children.last.quantity).to eq(2)
+  end
+
+  it 'inserts quantities' do
+    plot = klass.new
+    player = plot.introduce
+    plot.make Gamefic::Commodities::Commodity, name: 'thing', quantity: 5, parent: player
+    receptacle = plot.make Gamefic::Standard::Receptacle, name: 'receptacle', parent: plot.room
+    player.perform 'insert 2 things in receptacle'
+    expect(player.children.first.quantity).to eq(3)
+    expect(receptacle.children.first.quantity).to eq(2)
+  end
+
+  it 'places quantities' do
+    plot = klass.new
+    player = plot.introduce
+    plot.make Gamefic::Commodities::Commodity, name: 'thing', quantity: 5, parent: player
+    receptacle = plot.make Gamefic::Standard::Supporter, name: 'supporter', parent: plot.room
+    player.perform 'place 2 things on supporter'
+    expect(player.children.first.quantity).to eq(3)
+    expect(receptacle.children.first.quantity).to eq(2)
   end
 end
