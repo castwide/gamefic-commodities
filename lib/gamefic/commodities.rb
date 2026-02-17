@@ -9,7 +9,7 @@ module Gamefic
     require 'gamefic/commodities/commodity'
     require 'gamefic/commodities/utils'
     require 'gamefic/commodities/actions'
+
+    include Gamefic::Commodities::Actions
   end
 end
-
-Gamefic::Standard.include Gamefic::Commodities::Actions

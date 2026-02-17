@@ -4,7 +4,7 @@ RSpec.describe Gamefic::Commodities::Actions do
   let(:klass) do
     Class.new(Gamefic::Plot) do
       include Gamefic::Standard
-      include Gamefic::Commodities::Actions
+      include Gamefic::Commodities
 
       attr_seed :room, Gamefic::Standard::Room, name: 'room'
 

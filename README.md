@@ -13,7 +13,7 @@ Players can specify quantities in commands, e.g., `take 1 coin`.
 
 Add the library to your Gamefic project's Gemfile:
 
-```
+```ruby
 gem 'gamefic-commodities'
 ```
 
@@ -21,8 +21,17 @@ Run `bundle install`.
 
 Add the requirement to your project's code (typically in `main.rb`):
 
-```
+```ruby
 require 'gamefic-commodities'
+```
+
+Include the module in your project's plot:
+
+```ruby
+class Example < Gamefic::Plot
+  include Gamefic::Standard
+  include Gamefic::Commodities
+end
 ```
 
 ## Usage
